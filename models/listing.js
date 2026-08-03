@@ -1,0 +1,43 @@
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
+const Review = require("./reviews.js");
+
+//SCHEMA FOR DB
+
+const listingSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  description: String,
+  image: {
+    type: String,
+    default:
+      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmVhY2glMjBob3VzZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60", //if img doesnt exsist
+    set: (v) =>
+      v === ""
+        ? "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmVhY2glMjBob3VzZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" //if img link is empty
+        : v,
+  },
+
+  price: Number,
+  location: String,
+  country: String,
+  reviews: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Review",
+    },
+  ],
+});
+
+//mongoose middleeware
+//if we dlt a particular listing this mw dlts all reviews of that listing from db
+listingSchema.post("findOneAndDelete", async (listing) => {
+  if (listing) {
+    await Review.deleteMany({ _id: { $in: listing.reviews } }); //delete _id of the reviews that comes inside listing review array
+  }
+});
+
+const Listing = mongoose.model("Listing", listingSchema);
+module.exports = Listing;

@@ -31,7 +31,7 @@ router.post(
 
     await newReview.save();
     await listing.save();
-
+    req.flash("success", "Review Added!");
     res.redirect(`/listings/${listing._id}`);
   }),
 );
@@ -44,7 +44,7 @@ router.delete(
     //to dlt the reviewId from review array we use mongoose op $pull=> remove
     await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } }); //pulls reviewId from reviews[]
     await Review.findByIdAndDelete(reviewId);
-
+    req.flash("success", "Review Deleted!");
     res.redirect(`/listings/${id}`);
   }),
 );

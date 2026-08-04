@@ -5,6 +5,8 @@ const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate"); //helps to create templates (common layouts)
 const ExpressError = require("./utils/ExpressError.js");
+const session = require("express-session");
+const flash = require("connect-flash");
 
 const listings = require("./routes/listing.js");
 const reviews = require("./routes/review.js");
@@ -31,35 +33,35 @@ app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
+const sessionOptions = {
+  secret: "mysupersecretcode", //for temp
+  resave: false,
+  saveUninitialized: true,
+  //cookie tracks sessions
+  cookie: {
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000, //milisec in 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true, //for security from cross scripting attacks
+  },
+};
+
 app.get("/", (req, res) => {
   res.send("hi Im root");
 });
 
-//valiation err handling func
-const validateListing = (req, res, next) => {
-  let { error } = listingSchema.validate(req.body); //req.body checks if listingSchema created in Joi satifies all condtions or not
-  if (error) {
-    let errMsg = error.details.map((el) => el.message).join(","); //seperates all err details joins the err msg and sepretae by ,
-    throw new ExpressError(400, errMsg);
-  } else {
-    next();
-  }
-};
+app.use(session(sessionOptions));
+app.use(flash()); //use flash just before routes
+
+//flash middleware
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success"); //in req.flash if any success msg comes it saves in res.locals
+  res.locals.error = req.flash("error");
+  next(); //if we dont call next then stucks here only
+});
 
 //use routes files
 app.use("/listings", listings);
 app.use("/listings/:id/reviews", reviews);
-
-//method for reviewSChema validation (server side validation)
-const validatReview = (req, res, next) => {
-  let { error } = reviewSchema.validate(req.body); //req.body checks if reviewSchema created in Joi satifies all condtions or not
-  if (error) {
-    let errMsg = error.details.map((el) => el.message).join(","); //seperates all err details joins the err msg and sepretae by ,
-    throw new ExpressError(400, errMsg);
-  } else {
-    next();
-  }
-};
 
 //if no route matches then this will get executed
 //ERROR FOR *
@@ -77,7 +79,31 @@ app.listen(8080, () => {
   console.log("server is listening to port 8080");
 });
 
+/*
+//express session to store useful info on browers (ex: without creating acc we can add item to cart in some websites )
+const session = require("express-session");
 
+const sessionOptions = {
+  secret: "mysupersecret", //secrest code
+  resave: "false",         //temprory storage
+  saveUninitialised: true, //is session is not initialised then also save 
+}
+
+app.use(session(sessionOptions)); //for any req a session id is created 
+
+app.get("/register", (req, res) => {
+  let { name } = req.query; //extract name from query
+  //this is so store session info
+  req.session.name = name; //req.session is an obj , name is variable
+  res.redirect(req.session.name);
+});
+
+app.get("/hello", (req, res) => {
+  res.send(`hello, ${req.session.name}`); //this is how we can extract/use session info from seperate route
+} );
+
+//to count no of req user send use if(req.session.count){req.session.count++;}
+*/
 
 /*
 //cookies stores some info in our browers which is used by diff page of our website
@@ -96,8 +122,6 @@ app.get("/verify", (req, res) => {
   res.send("verified coookie");
 });
 */
-
-
 
 //sample data for testing
 // app.get("/testListing", async (req, res) => {

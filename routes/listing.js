@@ -36,7 +36,11 @@ router.get(
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id).populate("reviews");
-    //  console.log(listing);
+    if (!listing) {
+      console.log(req.flash("error"));
+      req.flash("error", "Listing does not Exist!");
+      return res.redirect("/listings");
+    }
     res.render("listings/show.ejs", { listing });
   }),
 );
@@ -49,6 +53,9 @@ router.post(
     // let {title, description, image, price, location, country} = req.body; //in place of this use js object method
     const newListing = new Listing(req.body.listing); //req.body.listing => listing is obj whose data comes from new.ejs
     await newListing.save();
+    //access this msg in app.js
+    req.flash("success", "New Listing Created!"); //flash msg passed using key:msg pair
+    //use this flash msg where this route is redirecting (appears only once)
     res.redirect("/listings");
   }),
 );
@@ -59,6 +66,10 @@ router.get(
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
+    if (!listing) {
+      req.flash("error", "Listing does not Exist!");
+      return res.redirect("/listings");
+    }
     res.render("listings/edit.ejs", { listing });
   }),
 );
@@ -70,6 +81,7 @@ router.put(
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+    req.flash("success", " Listing Updated!");
     res.redirect(`/listings/${id}`);
   }),
 );
@@ -81,6 +93,7 @@ router.delete(
     let { id } = req.params;
     let deletedListing = await Listing.findByIdAndDelete(id); //when this is called the middleware listingSchema.post in listiing.js is called too
     console.log(deletedListing);
+    req.flash("success", "Listing Deleted!");
     res.redirect("/listings");
   }),
 );

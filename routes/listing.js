@@ -4,6 +4,7 @@ const wrapAsync = require("../utils/wrapAsync.js");
 const ExpressError = require("../utils/ExpressError.js");
 const { listingSchema } = require("../schema.js"); //joi
 const Listing = require("../models/listing.js");
+const { isLoggedIn } = require("../middleware.js");
 
 //valiation err handling func
 const validateListing = (req, res, next) => {
@@ -26,7 +27,9 @@ router.get(
 );
 
 //New Route
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
+  //isLoggedIn is a middleware
+  //console.log(req.user); //req.user stores user logged in info
   res.render("listings/new.ejs");
 });
 
@@ -48,6 +51,7 @@ router.get(
 //create Route (C)
 router.post(
   "/",
+  isLoggedIn,
   validateListing,
   wrapAsync(async (req, res, next) => {
     // let {title, description, image, price, location, country} = req.body; //in place of this use js object method
@@ -63,6 +67,7 @@ router.post(
 //Edit Route
 router.get(
   "/:id/edit",
+  isLoggedIn,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id);
@@ -77,6 +82,7 @@ router.get(
 //Update Route (U)
 router.put(
   "/:id",
+  isLoggedIn,
   validateListing,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
@@ -89,6 +95,7 @@ router.put(
 //Delete route (D)
 router.delete(
   "/:id",
+  isLoggedIn,
   wrapAsync(async (req, res) => {
     let { id } = req.params;
     let deletedListing = await Listing.findByIdAndDelete(id); //when this is called the middleware listingSchema.post in listiing.js is called too

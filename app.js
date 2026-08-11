@@ -57,8 +57,8 @@ app.get("/", (req, res) => {
 app.use(session(sessionOptions));
 app.use(flash()); //use flash just before routes
 
-app.use(passport.initialize()); //for every req pw gets initialized , passport uses sessions so use session 1st
-app.use(passport.session()); // (web appshould know whether a req is going from one page to another is sent by same user) , this series of req res assciated with same useris called session
+app.use(passport.initialize()); //for every req passport gets initialized , passport uses sessions so use session 1st
+app.use(passport.session()); // (web app should know whether a req  going from one page to another is sent by same user) , this series of req res assciated with same useris called session
 passport.use(new LocalStrategy(User.authenticate()));
 
 // use static authenticate method of model in LocalStrategy
@@ -68,10 +68,11 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser()); //stores user info in session (user login info)
 passport.deserializeUser(User.deserializeUser()); //removes users info from session
 
-//flash middleware
+//flash middleware (we can store req obj here to access in ejs template)
 app.use((req, res, next) => {
   res.locals.success = req.flash("success"); //in req.flash if any success msg comes it saves in res.locals
   res.locals.error = req.flash("error");
+  res.locals.currUser = req.user;
   next(); //if we dont call next then stucks here only
 });
 

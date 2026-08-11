@@ -38,12 +38,15 @@ router.get(
   "/:id",
   wrapAsync(async (req, res) => {
     let { id } = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
+    const listing = await Listing.findById(id)
+      .populate("reviews")
+      .populate("owner");
     if (!listing) {
       console.log(req.flash("error"));
       req.flash("error", "Listing does not Exist!");
       return res.redirect("/listings");
     }
+    console.log(listing);
     res.render("listings/show.ejs", { listing });
   }),
 );
@@ -56,6 +59,7 @@ router.post(
   wrapAsync(async (req, res, next) => {
     // let {title, description, image, price, location, country} = req.body; //in place of this use js object method
     const newListing = new Listing(req.body.listing); //req.body.listing => listing is obj whose data comes from new.ejs
+    newListing.owner = req.user._id;
     await newListing.save();
     //access this msg in app.js
     req.flash("success", "New Listing Created!"); //flash msg passed using key:msg pair

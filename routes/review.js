@@ -4,17 +4,23 @@ const wrapAsync = require("../utils/wrapAsync.js");
 const ExpressError = require("../utils/ExpressError.js");
 const Review = require("../models/reviews.js");
 const Listing = require("../models/listing.js");
-const { validateReview } = require("../middleware.js");
+const {
+  validateReview,
+  isLoggedIn,
+  isReviewAuthor,
+} = require("../middleware.js");
 
 //Reviews
 //post review route
 router.post(
   "/",
+  isLoggedIn,
   validateReview, //vaidateReview is passed as a middleware
   wrapAsync(async (req, res) => {
     //if we r storing anyhting in db use async
     let listing = await Listing.findById(req.params.id);
     let newReview = new Review(req.body.review); //review=> comes from show.ejs
+    newReview.author = req.user._id;
 
     listing.reviews.push(newReview); //push newReview coming to listings/id/reviews to reviews[] array
 
@@ -28,6 +34,8 @@ router.post(
 //delete review route
 router.delete(
   "/:reviewId",
+  isLoggedIn,
+  isReviewAuthor,
   wrapAsync(async (req, res) => {
     let { id, reviewId } = req.params;
     //to dlt the reviewId from review array we use mongoose op $pull=> remove

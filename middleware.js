@@ -1,4 +1,5 @@
 const Listing = require("./models/listing.js");
+const Review = require("./models/reviews.js");
 const ExpressError = require("./utils/ExpressError.js");
 const { listingSchema, reviewSchema } = require("./schema.js"); //joi
 
@@ -32,6 +33,7 @@ module.exports.isOwner = async (req, res, next) => {
   }
   next();
 };
+
 //valiation err handling func
 module.exports.validateListing = (req, res, next) => {
   let { error } = listingSchema.validate(req.body); //req.body checks if listingSchema created in Joi satifies all condtions or not
@@ -52,4 +54,16 @@ module.exports.validateReview = (req, res, next) => {
   } else {
     next();
   }
+};
+
+//to check if user deleting review is its author
+module.exports.isReviewAuthor = async (req, res, next) => {
+  let { id, reviewId } = req.params;
+  let review = await Review.findById(reviewId);
+  //server side route handling
+  if (!review.author._id.equals(res.locals.currUser._id)) {
+    req.flash("error", "You are not the author of this review!");
+    return res.redirect(`/listings/${id}`);
+  }
+  next();
 };

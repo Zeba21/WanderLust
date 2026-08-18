@@ -10,25 +10,15 @@ const {
   isReviewAuthor,
 } = require("../middleware.js");
 
+const reviewController = require("../controllers/reviews.js");
+
 //Reviews
 //post review route
 router.post(
   "/",
   isLoggedIn,
   validateReview, //vaidateReview is passed as a middleware
-  wrapAsync(async (req, res) => {
-    //if we r storing anyhting in db use async
-    let listing = await Listing.findById(req.params.id);
-    let newReview = new Review(req.body.review); //review=> comes from show.ejs
-    newReview.author = req.user._id;
-
-    listing.reviews.push(newReview); //push newReview coming to listings/id/reviews to reviews[] array
-
-    await newReview.save();
-    await listing.save();
-    req.flash("success", "Review Added!");
-    res.redirect(`/listings/${listing._id}`);
-  }),
+  wrapAsync(reviewController.createReview),
 );
 
 //delete review route
@@ -36,14 +26,7 @@ router.delete(
   "/:reviewId",
   isLoggedIn,
   isReviewAuthor,
-  wrapAsync(async (req, res) => {
-    let { id, reviewId } = req.params;
-    //to dlt the reviewId from review array we use mongoose op $pull=> remove
-    await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } }); //pulls reviewId from reviews[]
-    await Review.findByIdAndDelete(reviewId);
-    req.flash("success", "Review Deleted!");
-    res.redirect(`/listings/${id}`);
-  }),
+  wrapAsync(reviewController.destroyReview),
 );
 
 module.exports = router;

@@ -16,14 +16,13 @@ router
   .get(wrapAsync(listingController.index)) //index callback is present in controllers
 
   //create route
-  // .post(
-  //   isLoggedIn,
-  //   validateListing,
-  //   wrapAsync(listingController.createListing),
-  // );
-  .post(upload.single("listing[image]"), (req, res) => {
-    res.send(req.file); //file realted data
-  });
+  .post(
+    isLoggedIn,
+
+    upload.single("listing[image]"),
+    validateListing,
+    wrapAsync(listingController.createListing),
+  );
 
 //New Route
 router.get("/new", isLoggedIn, listingController.renderNewForm); //isLoggedIn is a middleware

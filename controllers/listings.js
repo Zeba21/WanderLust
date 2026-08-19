@@ -30,10 +30,11 @@ module.exports.showListing = async (req, res) => {
 };
 
 module.exports.createListing = async (req, res, next) => {
-  // let {title, description, image, price, location, country} = req.body; //in place of this use js object method
+  let url = req.file.path;
+  let filename = req.file.filename;
   const newListing = new Listing(req.body.listing); //req.body.listing => listing is obj whose data comes from new.ejs
-  //console.log(req.user);
   newListing.owner = req.user._id;
+  newListing.image = { url, filename };
   await newListing.save();
   //access this msg in app.js
   req.flash("success", "New Listing Created!"); //flash msg passed using key:msg pair

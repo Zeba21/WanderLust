@@ -1,3 +1,9 @@
+if (process.env.NODE_ENV != "production") {
+  //necesary for dev phase
+  require("dotenv").config();
+}
+console.log(process.env.SECRET); //Dotenv is a zero-dependency module that loads environment variables from a .env file into process.env.
+
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");

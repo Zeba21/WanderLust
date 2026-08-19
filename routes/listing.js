@@ -3,8 +3,11 @@ const router = express.Router(); //express router helps to screate seperates com
 const wrapAsync = require("../utils/wrapAsync.js");
 const Listing = require("../models/listing.js");
 const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
-
 const listingController = require("../controllers/listings.js");
+//Multer is a node.js middleware for handling multipart/form-data, which is primarily used for uploading files
+const multer = require("multer");
+const { storage } = require("../cloudConfig.js");
+const upload = multer({ storage }); //multer auto creates a folder and saves file in it
 
 //Use router.route() to avoid duplicate route naming (is pth is same combine in one)
 router
@@ -13,11 +16,14 @@ router
   .get(wrapAsync(listingController.index)) //index callback is present in controllers
 
   //create route
-  .post(
-    isLoggedIn,
-    validateListing,
-    wrapAsync(listingController.createListing),
-  );
+  // .post(
+  //   isLoggedIn,
+  //   validateListing,
+  //   wrapAsync(listingController.createListing),
+  // );
+  .post(upload.single("listing[image]"), (req, res) => {
+    res.send(req.file); //file realted data
+  });
 
 //New Route
 router.get("/new", isLoggedIn, listingController.renderNewForm); //isLoggedIn is a middleware
@@ -43,8 +49,5 @@ router.get(
   isOwner,
   wrapAsync(listingController.renderEditForm),
 );
-
-//Delete route (D)
-router;
 
 module.exports = router;

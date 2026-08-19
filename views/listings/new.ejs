@@ -1,67 +1,112 @@
 <% layout("layouts/boilerplate") %>
 
-  <div class="row mt-3">
-    <!--col-8 means if the screen is divided into 12 cols then our page width should occupy 8 cols width &offset-2 means from left side give space-->
-    <div class="col-8 offset-2">
-      <h3>Create a New listing</h3><br>
-      <form method="POST" action="/listings" novalidate class="needs-validation">
-        <!--novalidate will remove default browers styling-->
+<div class="row mt-3">
+  <!--col-8 means if the screen is divided into 12 cols then our page width should occupy 8 cols width &offset-2 means from left side give space-->
+  <div class="col-8 offset-2">
+    <h3>Create a New listing</h3>
+    <br />
+    <form
+      method="POST"
+      action="/listings"
+      novalidate
+      class="needs-validation"
+      enctype="multipart/form-data"
+    >
+      <!-- enctype -> form can now send files to backend -->
+      <!--novalidate will remove default browers styling-->
 
-        <!-- //TITLE -->
+      <!-- //TITLE -->
 
-        <!-- bootsrtap class marginbottom3 for space -->
-        <div class="mb-3">
-          <label for="title" class="form-label">Title </label>
-          <!-- creating key value pairs for name-->
-          <input name="listing[title]" placeholder="Add a title" type="text" class="form-control" required />
-          <div class="valid-feedback">Title looks good!</div>
-          <div class="invalid-feedback">Title required</div>
+      <!-- bootsrtap class marginbottom3 for space -->
+      <div class="mb-3">
+        <label for="title" class="form-label">Title </label>
+        <!-- creating key value pairs for name-->
+        <input
+          name="listing[title]"
+          placeholder="Add a title"
+          type="text"
+          class="form-control"
+          required
+        />
+        <div class="valid-feedback">Title looks good!</div>
+        <div class="invalid-feedback">Title required</div>
+      </div>
+
+      <!-- //DESCRIPTION -->
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea
+          name="listing[description]"
+          class="form-control"
+          required
+        ></textarea>
+        <div class="invalid-feedback">Please add short description</div>
+      </div>
+
+      <!-- //IMAGE -->
+      <!-- 
+      <div class="mb-3">
+        <label for="image" class="form-label">Image Link</label>
+        <input
+          name="listing[image]"
+          placeholder="Add image URL/LINK"
+          type="text"
+          class="form-control"
+        />
+      </div> -->
+
+      <div class="mb-3">
+        <label for="image" class="form-label">Upload File</label>
+        <input name="listing[image]" type="file" class="form-control" />
+      </div>
+
+      <!-- //PRICE -->
+      <!-- to make price and country in ame line after medium screen size , put both in a row then price occupies 4th col and country 8th col-->
+      <div class="row">
+        <div class="mb-3 col-md-4">
+          <label for="price" class="form-label">Price</label>
+          <input
+            name="listing[price]"
+            placeholder="Enter price /night"
+            type="number"
+            class="form-control"
+            required
+          />
+          <div class="invalid-feedback">Please enter valid price</div>
         </div>
 
-        <!-- //DESCRIPTION -->
+        <!-- //COUNTRY -->
 
-        <div class="mb-3">
-          <label for="description" class="form-label">Description</label>
-          <textarea name="listing[description]" class="form-control" required></textarea>
-          <div class="invalid-feedback">Please add short description</div>
+        <div class="mb-3 col-md-8">
+          <label for="country" class="form-label">Country</label>
+          <input
+            name="listing[country]"
+            placeholder="country name"
+            type="text"
+            class="form-control"
+            required
+          />
+          <div class="invalid-feedback">Country should be valid</div>
         </div>
+      </div>
 
+      <!-- //LOCATION -->
 
-        <!-- //IMAGE -->
+      <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input
+          name="listing[location]"
+          placeholder="Enter location"
+          type="text"
+          class="form-control"
+          required
+        />
+        <div class="invalid-feedback">Location should be valid</div>
+      </div>
 
-        <div class="mb-3">
-          <label for="image" class="form-label">Image Link</label>
-          <input name="listing[image]" placeholder="Add image URL/LINK" type="text" class="form-control" />
-        </div>
-
-        <!-- //PRICE -->
-        <!-- to make price and country in ame line after medium screen size , put both in a row then price occupies 4th col and country 8th col-->
-        <div class="row">
-          <div class="mb-3 col-md-4">
-            <label for="price" class="form-label">Price</label>
-            <input name="listing[price]" placeholder="Enter price /night" type="number" class="form-control" required />
-            <div class="invalid-feedback">Please enter valid price</div>
-          </div>
-
-          <!-- //COUNTRY -->
-
-          <div class="mb-3 col-md-8">
-            <label for="country" class="form-label">Country</label>
-            <input name="listing[country]" placeholder="country name" type="text" class="form-control" required />
-            <div class="invalid-feedback">Country should be valid</div>
-          </div>
-        </div>
-
-        <!-- //LOCATION -->
-
-        <div class="mb-3">
-          <label for="location" class="form-label">Location</label>
-          <input name="listing[location]" placeholder="Enter location" type="text" class="form-control" required />
-          <div class="invalid-feedback">Location should be valid</div>
-        </div>
-
-        <button class="btn btn-dark add-btn mt-3">Add</button>
-        <br><br>
-      </form>
-    </div>
+      <button class="btn btn-dark add-btn mt-3">Add</button>
+      <br /><br />
+    </form>
   </div>
+</div>

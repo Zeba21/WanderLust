@@ -73,9 +73,10 @@ body {
 }
 
 .card-img-top {
-  border-radius: 1rem !important;
   width: 100% !important;
+  height: 235px;
   object-fit: cover !important;
+  border-radius: 1rem !important;
   /* img covers full area of container */
   margin-bottom: 0.5rem;
 }
@@ -130,4 +131,10 @@ body {
 .show-card {
   padding-left: 0;
   padding-right: 0;
+}
+
+/* MAP */
+#map {
+  height: 300px;
+  width: 100%;
 }

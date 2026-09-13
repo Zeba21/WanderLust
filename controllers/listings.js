@@ -1,4 +1,8 @@
 const Listing = require("../models/listing.js");
+const maptilerClient = require("@maptiler/client");
+
+// MapTiler config
+maptilerClient.config.apiKey = process.env.MAPTILER_API_KEY;
 
 module.exports.index = async (req, res) => {
   const allListings = await Listing.find({});
@@ -26,21 +30,44 @@ module.exports.showListing = async (req, res) => {
     return res.redirect("/listings");
   }
   //console.log(listing);
-  res.render("listings/show.ejs", { listing });
+  res.render("listings/show.ejs", {
+    listing,
+    mapKey: process.env.MAPTILER_API_KEY,
+  });
 };
 
 module.exports.createListing = async (req, res, next) => {
-  let url = req.file.path;
-  let filename = req.file.filename;
+  // 1. Forward geocode using MapTiler
+  const response = await maptilerClient.geocoding.forward(
+    req.body.listing.location,
+    { limit: 1 },
+  );
 
-  const newListing = new Listing(req.body.listing); //req.body.listing => listing is obj whose data comes from new.ejs
+  console.log("--- GEODATA RESULT ---");
+  console.log(response.features[0].geometry);
+
+  const newListing = new Listing(req.body.listing);
   newListing.owner = req.user._id;
-  newListing.image = { url, filename };
-  await newListing.save();
-  //access this msg in app.js
-  req.flash("success", "New Listing Created!"); //flash msg passed using key:msg pair
-  //use this flash msg where this route is redirecting (appears only once)
-  res.redirect("/listings");
+
+  // Handle uploaded image file if present
+  if (req.file) {
+    let url = req.file.path;
+    let filename = req.file.filename;
+    newListing.image = { url, filename };
+  }
+  if (!response.features.length) {
+    req.flash("error", "Location could not be found");
+    return res.redirect("/listings/new");
+  }
+
+  newListing.geometry = response.features[0].geometry;
+
+  let savedListing = await newListing.save();
+  console.log(savedListing);
+
+  req.flash("success", "New Listing Created!");
+  // Redirect with backticks template literals
+  res.redirect(`/listings/${savedListing._id}`);
 };
 
 module.exports.renderEditForm = async (req, res) => {

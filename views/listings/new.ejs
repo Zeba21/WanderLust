@@ -77,6 +77,26 @@
           <div class="invalid-feedback">Please enter valid price</div>
         </div>
 
+        <!-- Category -->
+
+       <div class="mb-3 col-md-8">
+       <label for="category" class="form-label">Category</label>
+
+       <select
+         name="listing[category]"
+         class="form-control"
+         required
+        >
+         <option value="" selected disabled>Select category</option>
+         
+         <% categories.forEach(category => { %>
+          <option value="<%= category %>"><%= category %></option>
+        <% }) %>
+      </select>
+
+  <div class="invalid-feedback">Please select a valid category</div>
+</div>
+
         <!-- //COUNTRY -->
 
         <div class="mb-3 col-md-8">

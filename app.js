@@ -56,9 +56,9 @@ const sessionOptions = {
   },
 };
 
-app.get("/", (req, res) => {
-  res.send("hi Im root");
-});
+// app.get("/", (req, res) => {
+//   res.send("hi Im root");
+// });
 
 app.use(session(sessionOptions));
 app.use(flash()); //use flash just before routes

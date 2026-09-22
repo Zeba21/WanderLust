@@ -5,13 +5,30 @@ const maptilerClient = require("@maptiler/client");
 maptilerClient.config.apiKey = process.env.MAPTILER_API_KEY;
 
 module.exports.index = async (req, res) => {
-  const allListings = await Listing.find({});
+  // const allListings = await Listing.find({});
+  // res.render("listings/index.ejs", { allListings });
+
+  const { category } = req.query;
+  console.log("Category from URL:", category);
+
+  let allListings;
+
+  if (category) {
+    allListings = await Listing.find({ category: category });
+  } else {
+    allListings = await Listing.find({});
+  }
+  console.log("Listings found:", allListings);
+
   res.render("listings/index.ejs", { allListings });
 };
 
 module.exports.renderNewForm = (req, res) => {
   //console.log(req.user); //req.user stores user logged in info
-  res.render("listings/new.ejs");
+  //res.render("listings/new.ejs");
+  const categories = Listing.schema.path("category").enumValues;
+
+  res.render("listings/new.ejs", { categories });
 };
 
 module.exports.showListing = async (req, res) => {
@@ -60,7 +77,7 @@ module.exports.createListing = async (req, res, next) => {
     return res.redirect("/listings/new");
   }
 
-  newListing.geometry = response.features[0].geometry;
+  newListing.geometry = response.features[0].geometry; //stores cooridinates of locatiom
 
   let savedListing = await newListing.save();
   console.log(savedListing);

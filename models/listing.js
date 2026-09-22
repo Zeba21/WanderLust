@@ -48,6 +48,20 @@ const listingSchema = new Schema({
       required: true,
     },
   },
+  category: {
+    type: String,
+    enum: [
+      "Mountains",
+      "Beaches",
+      "Farms",
+      "Camping",
+      "Arctic",
+      "Pools",
+      "Castles",
+      "Rooms",
+      "Iconic cities",
+    ],
+  },
 });
 
 //mongoose middleeware
